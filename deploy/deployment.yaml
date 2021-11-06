@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: admission-webhook
+  namespace: webhook
+  labels:
+    app: webhook
+    service: admission-webhook
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webhook
+      service: admission-webhook
+  template:
+    metadata:
+      labels:
+        app: webhook
+        service: admission-webhook
+    spec:
+      containers:
+      - name: admission-webhook
+        image: dmathai/admission-webhook-sample:latest
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: admission-webhook-cert
+          mountPath: /cert
+        env:
+        - name: SSL_CRT_FILE_NAME
+          value: "/cert/server.crt"
+        - name: SSL_KEY_FILE_NAME
+          value: "/cert/server.key"
+      volumes:
+      - name: admission-webhook-cert
+        configMap:
+          name: admission-webhook-cert
+
